@@ -122,10 +122,11 @@
     </div>
 
     <!-- SCRIPT MOVIDO PARA O FINAL DO BODY PARA GARANTIR O CARREGAMENTO -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/papaparse/5.3.2/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/papaparse/5.3.2/papaparse.min.js" onload="initializeApp()"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
+        // A lógica principal agora está dentro desta função, que é chamada pelo 'onload' do script PapaParse
+        async function initializeApp() {
             // --- LINKS DA PLANILHA ---
             const URLS = {
                 atividades: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTaPNwPCuGyqUOuuyy1VbzxDvPVckinCg0DVwotQerHDIp88IflAPYYBfLgViqCNybvnxfNHkpyPBDK/pub?output=csv',
@@ -159,30 +160,24 @@
                         download: true,
                         header: true,
                         skipEmptyLines: true,
-                        transformHeader: header => header.trim(), // Limpa espaços em branco dos cabeçalhos
+                        transformHeader: header => header.trim(),
                         complete: (results) => {
-                            // DEBUG: Log para verificar os cabeçalhos e os primeiros dados
                             console.log(`--- DADOS CARREGADOS: ${key} ---`);
-                            if (results.meta && results.meta.fields) {
-                                console.log('Nomes das colunas recebidos:', results.meta.fields);
-                            }
-                            if (results.data.length > 0) {
-                                console.log('Primeira linha de dados:', results.data[0]);
-                            } else {
-                                console.log('Nenhum dado encontrado nesta aba.');
-                            }
+                            if (results.meta && results.meta.fields) console.log('Colunas:', results.meta.fields);
+                            if (results.data.length > 0) console.log('1ª linha:', results.data[0]);
+                            else console.log('Nenhum dado encontrado.');
                             console.log('-------------------------------------\n');
                             
                             if (results.errors.length > 0) {
-                                console.error(`Erros de parsing em ${key}:`, results.errors);
-                                reject(new Error(`Erro ao processar o CSV de ${key}.`));
+                                console.error(`Erros em ${key}:`, results.errors);
+                                reject(new Error(`Erro ao processar CSV de ${key}.`));
                             } else {
                                 resolve(results.data);
                             }
                         },
                         error: (error) => {
-                            console.error(`Erro de rede ao buscar ${key}:`, error);
-                            reject(new Error(`Não foi possível baixar o CSV de ${key}. Verifique o link e a conexão.`));
+                            console.error(`Erro de rede em ${key}:`, error);
+                            reject(new Error(`Não foi possível baixar CSV de ${key}.`));
                         }
                     });
                 });
@@ -364,7 +359,7 @@
                                             <p class="mt-4 text-gray-300">O erro detalhado foi: <code class="bg-gray-700 p-1 rounded text-red-400">${error.message}</code></p>
                                          </div>`;
             }
-        });
+        }
     </script>
 </body>
 </html>

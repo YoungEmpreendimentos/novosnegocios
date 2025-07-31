@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Controle de Novos Negócios</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/papaparse/5.3.2/papaparse.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Estilos para um scrollbar mais sutil */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+        .tab-button.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #3b82f6;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-white">Dashboard de Controle de Novos Negócios</h1>
+            <p class="text-gray-400 mt-2">Análise de performance e atividades.</p>
+        </header>
+
+        <!-- Navegação e Filtros Globais -->
+        <div class="bg-gray-800 rounded-lg p-4 mb-8 sticky top-4 z-10 shadow-lg">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <!-- Abas de Navegação -->
+                <div class="flex bg-gray-700 rounded-lg p-1">
+                    <button id="btnDadosGerais" class="tab-button py-2 px-4 rounded-md text-sm md:text-base font-semibold transition-colors duration-300">Dados Gerais</button>
+                    <button id="btnFiltroRegiao" class="tab-button py-2 px-4 rounded-md text-sm md:text-base font-semibold transition-colors duration-300">Filtro por Região</button>
+                </div>
+
+                <!-- Filtros de Data -->
+                <div class="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                    <label for="startDate" class="text-sm font-medium">De:</label>
+                    <input type="date" id="startDate" class="bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full sm:w-auto">
+                    <label for="endDate" class="text-sm font-medium">Até:</label>
+                    <input type="date" id="endDate" class="bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white w-full sm:w-auto">
+                     <button id="resetFilter" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300 w-full sm:w-auto">Limpar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conteúdo das Páginas -->
+        <main id="main-content">
+            <!-- Página: Dados Gerais -->
+            <div id="pageDadosGerais">
+                <div id="loaderDadosGerais" class="loader"></div>
+                <div id="contentDadosGerais" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-1 bg-gray-800 p-6 rounded-lg shadow-md">
+                        <h2 class="text-xl font-bold mb-4 text-white">Atividades por Dia</h2>
+                        <div id="atividadesContent" class="space-y-4 max-h-96 overflow-y-auto pr-2"></div>
+                    </div>
+                    <div class="lg:col-span-2 bg-gray-800 p-6 rounded-lg shadow-md">
+                        <h2 class="text-xl font-bold mb-4 text-white">Reuniões Realizadas com Imobiliárias</h2>
+                        <div class="max-h-96 overflow-y-auto">
+                            <table class="w-full text-left">
+                                <thead class="border-b border-gray-600"><tr><th class="py-2 px-4">Imobiliária</th><th class="py-2 px-4">Data</th><th class="py-2 px-4">Contato</th></tr></thead>
+                                <tbody id="reunioesContent"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-3 bg-gray-800 p-6 rounded-lg shadow-md">
+                        <h2 class="text-xl font-bold mb-4 text-white">Propostas Apresentadas por Mês</h2>
+                        <div id="propostasContent" class="space-y-6 max-h-96 overflow-y-auto pr-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Página: Filtro por Região -->
+            <div id="pageFiltroRegiao" class="hidden">
+                 <div class="bg-gray-800 p-6 rounded-lg shadow-md">
+                    <div id="loaderFiltroRegiao" class="loader"></div>
+                    <div id="contentFiltroRegiao" class="hidden">
+                        <div class="flex flex-col md:flex-row gap-4 items-center mb-6">
+                            <label for="regionSelect" class="text-lg font-semibold">Filtrar por Região:</label>
+                            <select id="regionSelect" class="bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white flex-grow"></select>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full min-w-max text-left">
+                                <thead class="border-b border-gray-600"><tr><th class="py-2 px-4">Cód.</th><th class="py-2 px-4">Cidade</th><th class="py-2 px-4">Bairro</th><th class="py-2 px-4">Área (ha)</th><th class="py-2 px-4">Proprietário</th><th class="py-2 px-4">Contato</th><th class="py-2 px-4">Valor (R$)</th><th class="py-2 px-4">Status</th></tr></thead>
+                                <tbody id="glebasContent"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // --- LINKS DA PLANILHA ---
+            const URLS = {
+                atividades: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTaPNwPCuGyqUOuuyy1VbzxDvPVckinCg0DVwotQerHDIp88IflAPYYBfLgViqCNybvnxfNHkpyPBDK/pub?output=csv',
+                imobiliarias: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTaPNwPCuGyqUOuuyy1VbzxDvPVckinCg0DVwotQerHDIp88IflAPYYBfLgViqCNybvnxfNHkpyPBDK/pub?gid=172873143&single=true&output=csv',
+                propostas: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTaPNwPCuGyqUOuuyy1VbzxDvPVckinCg0DVwotQerHDIp88IflAPYYBfLgViqCNybvnxfNHkpyPBDK/pub?gid=2032502494&single=true&output=csv',
+                glebas: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTaPNwPCuGyqUOuuyy1VbzxDvPVckinCg0DVwotQerHDIp88IflAPYYBfLgViqCNybvnxfNHkpyPBDK/pub?gid=22338632&single=true&output=csv'
+            };
+
+            // --- SELETORES DE ELEMENTOS DO DOM ---
+            const mainContent = document.getElementById('main-content');
+            const btnDadosGerais = document.getElementById('btnDadosGerais');
+            const btnFiltroRegiao = document.getElementById('btnFiltroRegiao');
+            const pageDadosGerais = document.getElementById('pageDadosGerais');
+            const pageFiltroRegiao = document.getElementById('pageFiltroRegiao');
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+            const resetFilterBtn = document.getElementById('resetFilter');
+            const regionSelect = document.getElementById('regionSelect');
+
+            const atividadesContent = document.getElementById('atividadesContent');
+            const reunioesContent = document.getElementById('reunioesContent');
+            const propostasContent = document.getElementById('propostasContent');
+            const glebasContent = document.getElementById('glebasContent');
+
+            let masterData = { atividades: [], imobiliarias: [], propostas: [], glebas: [] };
+
+            // --- FUNÇÃO PARA BUSCAR E PROCESSAR DADOS CSV ---
+            async function fetchData(key, url) {
+                return new Promise((resolve, reject) => {
+                    Papa.parse(url, {
+                        download: true,
+                        header: true,
+                        skipEmptyLines: true,
+                        transformHeader: header => header.trim(), // Limpa espaços em branco dos cabeçalhos
+                        complete: (results) => {
+                            // DEBUG: Log para verificar os cabeçalhos e os primeiros dados
+                            console.log(`--- DADOS CARREGADOS: ${key} ---`);
+                            if (results.meta && results.meta.fields) {
+                                console.log('Nomes das colunas recebidos:', results.meta.fields);
+                            }
+                            if (results.data.length > 0) {
+                                console.log('Primeira linha de dados:', results.data[0]);
+                            } else {
+                                console.log('Nenhum dado encontrado nesta aba.');
+                            }
+                            console.log('-------------------------------------\n');
+                            
+                            if (results.errors.length > 0) {
+                                console.error(`Erros de parsing em ${key}:`, results.errors);
+                                reject(new Error(`Erro ao processar o CSV de ${key}.`));
+                            } else {
+                                resolve(results.data);
+                            }
+                        },
+                        error: (error) => {
+                            console.error(`Erro de rede ao buscar ${key}:`, error);
+                            reject(new Error(`Não foi possível baixar o CSV de ${key}. Verifique o link e a conexão.`));
+                        }
+                    });
+                });
+            }
+            
+            function parseDate(dateString) {
+                if (!dateString || typeof dateString !== 'string' || !/^\d{2}\/\d{2}\/\d{4}$/.test(dateString.trim())) return null;
+                const [day, month, year] = dateString.trim().split('/');
+                return `${year}-${month}-${day}`;
+            }
+
+            // --- FUNÇÕES DE RENDERIZAÇÃO (sem alterações) ---
+            function renderAtividades(data) {
+                atividadesContent.innerHTML = '';
+                if (data.length === 0) {
+                    atividadesContent.innerHTML = '<p class="text-gray-400">Nenhuma atividade no período.</p>'; return;
+                }
+                const groupedByDate = data.reduce((acc, atividade) => {
+                    const date = atividade.data;
+                    if (!date) return acc;
+                    if (!acc[date]) acc[date] = {};
+                    const tipoContato = atividade['Tipo de Contato'];
+                    if(tipoContato) acc[date][tipoContato] = (acc[date][tipoContato] || 0) + 1;
+                    return acc;
+                }, {});
+                const sortedDates = Object.keys(groupedByDate).sort((a, b) => new Date(b) - new Date(a));
+                sortedDates.forEach(date => {
+                    const formattedDate = new Date(date + 'T00:00:00').toLocaleDateString('pt-BR');
+                    let dayHtml = `<div class="bg-gray-700 p-3 rounded-md"><p class="font-bold text-blue-400">${formattedDate}</p><ul class="list-disc list-inside text-gray-300 mt-2">`;
+                    const contatos = groupedByDate[date];
+                    for (const tipo in contatos) {
+                        dayHtml += `<li>${tipo}: <span class="font-semibold">${contatos[tipo]}</span></li>`;
+                    }
+                    dayHtml += `</ul></div>`;
+                    atividadesContent.innerHTML += dayHtml;
+                });
+            }
+
+            function renderReunioes(data) {
+                reunioesContent.innerHTML = '';
+                const filteredData = data.filter(item => item.Status === 'Reunião realizada');
+                if (filteredData.length === 0) {
+                    reunioesContent.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-400">Nenhuma reunião realizada.</td></tr>'; return;
+                }
+                filteredData.forEach(reuniao => {
+                    const formattedDate = reuniao.data ? new Date(reuniao.data + 'T00:00:00').toLocaleDateString('pt-BR') : 'Data inválida';
+                    const row = `<tr class="border-b border-gray-700 hover:bg-gray-700"><td class="py-2 px-4">${reuniao.Imobiliária}</td><td class="py-2 px-4">${formattedDate}</td><td class="py-2 px-4">${reuniao.Contato}</td></tr>`;
+                    reunioesContent.innerHTML += row;
+                });
+            }
+
+            function renderPropostas(data) {
+                propostasContent.innerHTML = '';
+                if (data.length === 0) {
+                    propostasContent.innerHTML = '<p class="text-gray-400">Nenhuma proposta no período.</p>'; return;
+                }
+                const groupedByMonth = data.reduce((acc, proposta) => {
+                    if (!proposta.data) return acc;
+                    const monthYear = new Date(proposta.data + 'T00:00:00').toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
+                    const capitalizedMonth = monthYear.charAt(0).toUpperCase() + monthYear.slice(1);
+                    if (!acc[capitalizedMonth]) acc[capitalizedMonth] = [];
+                    acc[capitalizedMonth].push(proposta);
+                    return acc;
+                }, {});
+                const monthOrder = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+                const sortedMonths = Object.keys(groupedByMonth).sort((a, b) => {
+                    const [ma, ya] = a.toLowerCase().split(' de '); const [mb, yb] = b.toLowerCase().split(' de ');
+                    if (ya !== yb) return yb - ya;
+                    return monthOrder.indexOf(mb) - monthOrder.indexOf(ma);
+                });
+                sortedMonths.forEach(month => {
+                    let monthHtml = `<div class="bg-gray-700 p-4 rounded-md"><h3 class="text-lg font-bold text-blue-400 mb-3">${month}</h3><div class="space-y-2">`;
+                    groupedByMonth[month].forEach(proposta => {
+                        const valorStr = proposta.Valor || '0';
+                        const valor = parseFloat(valorStr.replace('R$', '').replace(/\./g, '').replace(',', '.').trim());
+                        const formattedValue = isNaN(valor) ? 'N/A' : new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
+                        monthHtml += `<div class="flex justify-between items-center bg-gray-600 p-2 rounded"><span>${proposta.ID} - ${proposta.Imobiliária}</span><span class="font-semibold">${formattedValue}</span></div>`;
+                    });
+                    monthHtml += `</div></div>`;
+                    propostasContent.innerHTML += monthHtml;
+                });
+            }
+            
+            function renderGlebas(data, region) {
+                glebasContent.innerHTML = '';
+                const filteredData = region === 'todas' ? data : data.filter(g => g.Região === region);
+                if (filteredData.length === 0) {
+                    glebasContent.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-gray-400">Nenhuma gleba encontrada.</td></tr>'; return;
+                }
+                filteredData.forEach(gleba => {
+                    const valorStr = gleba.Valor || '0';
+                    const valor = parseFloat(valorStr.replace('R$', '').replace(/\./g, '').replace(',', '.').trim());
+                    const formattedValue = isNaN(valor) ? 'N/A' : new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
+                    const row = `<tr class="border-b border-gray-700 hover:bg-gray-700"><td class="py-2 px-4">${gleba['Cód.']}</td><td class="py-2 px-4">${gleba.Cidade}</td><td class="py-2 px-4">${gleba.Bairro}</td><td class="py-2 px-4">${gleba['Área (ha)']}</td><td class="py-2 px-4">${gleba.Proprietário}</td><td class="py-2 px-4">${gleba.Contato}</td><td class="py-2 px-4">${formattedValue}</td><td class="py-2 px-4"><span class="px-2 py-1 text-xs rounded-full ${gleba.Status === 'Disponível' ? 'bg-green-500 text-white' : 'bg-yellow-500 text-black'}">${gleba.Status}</span></td></tr>`;
+                    glebasContent.innerHTML += row;
+                });
+            }
+
+            function populateRegionFilter(data) {
+                const regions = [...new Set(data.map(item => item.Região).filter(Boolean))];
+                regionSelect.innerHTML = '<option value="todas">Todas as Regiões</option>';
+                regions.forEach(region => {
+                    regionSelect.innerHTML += `<option value="${region}">${region}</option>`;
+                });
+            }
+
+            function updateDashboard() {
+                const startDate = startDateInput.value ? new Date(startDateInput.value + 'T00:00:00') : null;
+                const endDate = endDateInput.value ? new Date(endDateInput.value + 'T23:59:59') : null;
+                const selectedRegion = regionSelect.value;
+                const filterByDate = (item) => {
+                    if (!item.data) return false;
+                    if (!startDate && !endDate) return true;
+                    const itemDate = new Date(item.data);
+                    if (startDate && itemDate < startDate) return false;
+                    if (endDate && itemDate > endDate) return false;
+                    return true;
+                };
+                renderAtividades(masterData.atividades.filter(filterByDate));
+                renderReunioes(masterData.imobiliarias.filter(filterByDate));
+                renderPropostas(masterData.propostas.filter(filterByDate));
+                renderGlebas(masterData.glebas, selectedRegion);
+            }
+
+            function showPage(pageId) {
+                if (pageId === 'dadosGerais') {
+                    pageDadosGerais.classList.remove('hidden'); pageFiltroRegiao.classList.add('hidden');
+                    btnDadosGerais.classList.add('active'); btnFiltroRegiao.classList.remove('active');
+                } else {
+                    pageDadosGerais.classList.add('hidden'); pageFiltroRegiao.classList.remove('hidden');
+                    btnDadosGerais.classList.remove('active'); btnFiltroRegiao.classList.add('active');
+                }
+            }
+            
+            resetFilterBtn.addEventListener('click', () => {
+                startDateInput.value = ''; endDateInput.value = ''; updateDashboard();
+            });
+
+            btnDadosGerais.addEventListener('click', () => showPage('dadosGerais'));
+            btnFiltroRegiao.addEventListener('click', () => showPage('filtroRegiao'));
+            startDateInput.addEventListener('change', updateDashboard);
+            endDateInput.addEventListener('change', updateDashboard);
+            regionSelect.addEventListener('change', updateDashboard);
+
+            // --- CARREGAMENTO INICIAL ---
+            try {
+                const [atividades, imobiliarias, propostas, glebas] = await Promise.all([
+                    fetchData('atividades', URLS.atividades),
+                    fetchData('imobiliarias', URLS.imobiliarias),
+                    fetchData('propostas', URLS.propostas),
+                    fetchData('glebas', URLS.glebas)
+                ]);
+
+                masterData.atividades = atividades.map(d => ({...d, data: parseDate(d.Data) }));
+                masterData.imobiliarias = imobiliarias.map(d => ({...d, data: parseDate(d.Data) }));
+                masterData.propostas = propostas.map(d => ({...d, data: parseDate(d.Data) }));
+                masterData.glebas = glebas;
+
+                populateRegionFilter(masterData.glebas);
+                
+                document.getElementById('loaderDadosGerais').classList.add('hidden');
+                document.getElementById('contentDadosGerais').classList.remove('hidden');
+                document.getElementById('loaderFiltroRegiao').classList.add('hidden');
+                document.getElementById('contentFiltroRegiao').classList.remove('hidden');
+
+                showPage('dadosGerais');
+                updateDashboard();
+
+            } catch (error) {
+                console.error("Falha ao carregar dados iniciais:", error);
+                mainContent.innerHTML = `<div class="text-center p-8 bg-gray-800 rounded-lg">
+                                            <h2 class="text-2xl font-bold text-red-500 mb-4">Erro ao carregar os dados da planilha.</h2>
+                                            <p class="text-gray-300">Por favor, verifique o seguinte:</p>
+                                            <ul class="list-disc list-inside text-left max-w-md mx-auto mt-4 text-gray-400">
+                                                <li>Se os links no código estão corretos.</li>
+                                                <li>Se a planilha está "Publicada na web" para qualquer pessoa com o link.</li>
+                                                <li>Pressione F12, vá para a aba "Console" e verifique se os nomes das colunas correspondem aos da sua planilha.</li>
+                                            </ul>
+                                            <p class="mt-4 text-gray-300">O erro detalhado foi: <code class="bg-gray-700 p-1 rounded text-red-400">${error.message}</code></p>
+                                         </div>`;
+            }
+        });
+    </script>
+</body>
+</html>

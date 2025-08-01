@@ -184,7 +184,7 @@
           </select>
       </div>
 
-      <h3 class="text-xl font-semibold mt-8 mb-4 text-slate-900">Detalhes da Gleba</h3>
+      <h3 class="text-xl font-semibold mt-8 mb-4 text-slate-900">Detalhes da Gleba <span id="glebasCount" class="accent-text font-bold"></span></h3>
       <div class="overflow-x-auto table-container">
           <table id="glebasTable" class="min-w-full divide-y divide-slate-200">
               <thead class="bg-slate-50">
@@ -249,7 +249,7 @@
                 if (!data || !tipoContato || tipoContato.trim() === '') return acc;
                 const dateParts = data.split('/');
                 if (dateParts.length !== 3) return acc;
-                const dateKey = `${dateParts[2]}-${dateParts[0].padStart(2, '0')}-${dateParts[1].padStart(2, '0')}`;
+                const dateKey = `${dateParts[2]}-${dateParts[1].padStart(2, '0')}-${dateParts[0].padStart(2, '0')}`;
                 const key = `${dateKey}|${tipoContato}`;
                 if (!acc[key]) acc[key] = { Data: dateKey, 'Tipo de Contato': tipoContato, Quantidade: 0 };
                 acc[key].Quantidade++;
@@ -269,11 +269,11 @@
                 const dateParts = data.split('/');
                 if (dateParts.length !== 3) return acc;
                 
-                const mesIndex = parseInt(dateParts[0], 10) - 1;
+                const mesIndex = parseInt(dateParts[1], 10) - 1;
                 const ano = dateParts[2];
                 if (isNaN(mesIndex) || mesIndex < 0 || mesIndex > 11 || isNaN(parseInt(ano))) return acc;
 
-                const sortKey = `${ano}-${dateParts[0].padStart(2, '0')}`;
+                const sortKey = `${ano}-${dateParts[1].padStart(2, '0')}`;
                 const displayMes = `${meses[mesIndex]}/${ano}`;
 
                 if (!acc[sortKey]) {
@@ -307,6 +307,7 @@
             const { headers: glebasHeaders, rows: glebasRawData } = parseCSV(glebasText);
             const glebasData = glebasRawData.filter(row => row[glebasHeaders[0]] && !isNaN(parseInt(row[glebasHeaders[0]], 10)));
             glebas_cols = glebasHeaders;
+            document.getElementById('glebasCount').innerText = `(${glebasData.length})`;
             const regioes = ["Metropolitana", "Litoral", "Santa Catarina"];
             populateSelect('regiaoSelect', regioes);
             populateTable('glebasTable', glebasHeaders, glebasData.map(row => glebasHeaders.map(h => row[h])));
@@ -423,6 +424,7 @@
       const tr = table.querySelectorAll("tbody tr");
       const regiaoHeaderName = glebas_cols.find(h => h.trim().toLowerCase() === 'região' || h.trim().toLowerCase() === 'regiao');
       const regiaoIndex = glebas_cols.indexOf(regiaoHeaderName);
+      let visibleCount = 0;
 
       tr.forEach(row => {
         const td = row.getElementsByTagName("td")[regiaoIndex];
@@ -430,11 +432,13 @@
           const txtValue = td.textContent || td.innerText;
           if (filter === "" || txtValue.toUpperCase().indexOf(filter) > -1) {
             row.style.display = "";
+            visibleCount++;
           } else {
             row.style.display = "none";
           }
         }
       });
+      document.getElementById('glebasCount').innerText = `(${visibleCount})`;
     }
     
     function filterTablesByDate() {

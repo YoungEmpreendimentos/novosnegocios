@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   body {
@@ -115,30 +116,37 @@
             </div>
         </div>
 
-        <!-- Card: Propostas por Mês -->
+        <!-- Card: Detalhes da Proposta -->
         <div class="bg-white p-6 rounded-lg shadow-sm">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-semibold text-slate-900">Propostas por Mês</h3>
-                <select id="propostasSort" onchange="sortAndPopulatePropostas()" class="block w-40 pl-3 pr-10 py-2 text-base border-slate-300 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm rounded-md">
-                    <option value="desc">Mais Recentes</option>
-                    <option value="asc">Mais Antigas</option>
-                </select>
-            </div>
+            <h3 class="text-xl font-semibold text-slate-900">Detalhes da Proposta <span id="totalPropostas" class="accent-text font-bold"></span></h3>
             <div class="table-container">
-                <table id="propostasTable" class="min-w-full divide-y divide-slate-200">
+                <table id="propostasDetalhadasTable" class="min-w-full divide-y divide-slate-200">
                     <thead class="bg-slate-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Mês</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Quantidade</th>
-                        </tr>
+                        <!-- Gerado via JS -->
                     </thead>
                     <tbody class="bg-white divide-y divide-slate-200">
+                        <!-- Gerado via JS -->
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
     
+    <!-- Nova Linha para os Gráficos -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        <!-- Card: Gráfico de Atividades por Dia -->
+        <div class="bg-white p-6 rounded-lg shadow-sm">
+            <h3 class="text-xl font-semibold text-slate-900 mb-4">Atividades por Dia</h3>
+            <canvas id="atividadesChartCanvas"></canvas>
+        </div>
+
+        <!-- Card: Gráfico de Propostas por Mês -->
+        <div class="bg-white p-6 rounded-lg shadow-sm">
+            <h3 class="text-xl font-semibold mb-4 text-slate-900">Propostas por Mês</h3>
+            <canvas id="propostasChartCanvas"></canvas>
+        </div>
+    </div>
+
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         <!-- Card: Contagem de Reuniões por Imobiliária -->
         <div class="bg-white p-6 rounded-lg shadow-sm">
@@ -205,7 +213,8 @@
     const GLEBAS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTaPNwPCuGyqUOuuyy1VbzxDvPVckinCg0DVwotQerHDIp88IflAPYYBfLgViqCNybvnxfNHkpyPBDK/pub?gid=22338632&single=true&output=csv";
 
     let glebas_cols = [];
-    let propostasDataGlobally = [];
+    let atividadesChart = null;
+    let propostasChart = null;
 
     // Função para parsear texto CSV para um array de objetos
     function parseCSV(text) {
@@ -213,8 +222,8 @@
         const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
         const rows = [];
         for (let i = 1; i < lines.length; i++) {
-            if (lines[i].trim() === '') continue; // Ignora linhas vazias
-            const values = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); // Handle commas inside quotes
+            if (lines[i].trim() === '') continue;
+            const values = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
             const row = {};
             for (let j = 0; j < headers.length; j++) {
                 row[headers[j]] = (values[j] || '').trim().replace(/"/g, '');
@@ -255,14 +264,20 @@
                 acc[key].Quantidade++;
                 return acc;
             }, {});
-            const totalAtividades = Object.values(atividadesPorDia).reduce((sum, item) => sum + item.Quantidade, 0);
+            const allAtividadesData = Object.values(atividadesPorDia);
+            const totalAtividades = allAtividadesData.reduce((sum, item) => sum + item.Quantidade, 0);
             document.getElementById('totalAtividades').innerText = `(${totalAtividades})`;
-            populateSimpleTable('atividadesTable', Object.values(atividadesPorDia), ['Data', 'Tipo de Contato', 'Quantidade'], 'Data');
+            populateSimpleTable('atividadesTable', allAtividadesData, ['Data', 'Tipo de Contato', 'Quantidade'], 'Data');
+            createAtividadesChart(allAtividadesData);
 
             // Processar Propostas
             const meses = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
             const { headers: propostasHeaders, rows: propostasRawData } = parseCSV(propostasText);
             const propostasData = propostasRawData.filter(row => row[propostasHeaders[0]] && !isNaN(parseInt(row[propostasHeaders[0]], 10)));
+            
+            document.getElementById('totalPropostas').innerText = `(${propostasData.length})`;
+            populatePropostasDetalhadas(propostasData, propostasHeaders);
+
             const propostasPorMes = propostasData.reduce((acc, row) => {
                 const data = row['Data'];
                 if (!data) return acc;
@@ -282,8 +297,7 @@
                 acc[sortKey].Quantidade++;
                 return acc;
             }, {});
-            propostasDataGlobally = Object.values(propostasPorMes);
-            sortAndPopulatePropostas();
+            createPropostasChart(Object.values(propostasPorMes));
 
             // Processar Reuniões com Imobiliárias
             const { headers: reunioesHeaders, rows: imobiliariasRawData } = parseCSV(imobiliariasText);
@@ -318,6 +332,33 @@
         } finally {
             document.getElementById('loading-indicator').style.display = 'none';
         }
+    }
+
+    function populatePropostasDetalhadas(data, headers) {
+        const table = document.getElementById('propostasDetalhadasTable');
+        const thead = table.querySelector('thead');
+        const tbody = table.querySelector('tbody');
+        thead.innerHTML = '';
+        tbody.innerHTML = '';
+
+        const colunasDesejadas = ['Data', 'Cidade', 'Status'];
+        const headersToShow = headers.filter(h => colunasDesejadas.includes(h));
+
+        let headerRow = '<tr>';
+        headersToShow.forEach(header => {
+            headerRow += `<th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">${header}</th>`;
+        });
+        headerRow += '</tr>';
+        thead.innerHTML = headerRow;
+
+        data.forEach(item => {
+            let row = '<tr class="data-row">';
+            headersToShow.forEach(header => {
+                 row += `<td class="px-6 py-4 text-sm text-slate-700">${item[header] || ''}</td>`;
+            });
+            row += '</tr>';
+            tbody.innerHTML += row;
+        });
     }
 
     function populateTable(tableId, headers, data) {
@@ -365,8 +406,8 @@
             data.sort((a, b) => {
                 const keyA = a[sortKey];
                 const keyB = b[sortKey];
-                if (keyA < keyB) return -1;
-                if (keyA > keyB) return 1;
+                if (keyA < keyB) return 1;
+                if (keyA > keyB) return -1;
                 return 0;
             });
         }
@@ -379,18 +420,6 @@
             row += '</tr>';
             tbody.innerHTML += row;
         });
-    }
-
-    function sortAndPopulatePropostas() {
-        const sortOrder = document.getElementById('propostasSort').value;
-        const sortedData = [...propostasDataGlobally].sort((a, b) => {
-            if (sortOrder === 'asc') {
-                return a.sortKey.localeCompare(b.sortKey);
-            } else {
-                return b.sortKey.localeCompare(a.sortKey);
-            }
-        });
-        populateSimpleTable('propostasTable', sortedData, ['Mês', 'Quantidade']);
     }
 
     function populateSelect(selectId, options) {
@@ -451,7 +480,7 @@
         let endDate = new Date(endDateInput + 'T23:59:59');
 
         filterTableByDate('atividadesTable', 0, startDate, endDate);
-        filterTableByDate('propostasTable', 0, startDate, endDate, true);
+        filterTableByDate('propostasDetalhadasTable', 0, startDate, endDate);
     }
     
     function clearDateFilter() {
@@ -459,34 +488,32 @@
         document.getElementById('endDate').value = '';
         
         showAllRows('atividadesTable');
-        showAllRows('propostasTable');
+        showAllRows('propostasDetalhadasTable');
     }
 
     function showAllRows(tableId) {
         const table = document.getElementById(tableId);
+        if (!table) return;
         const tr = table.querySelectorAll("tbody tr");
         tr.forEach(row => row.style.display = "");
     }
 
-    function filterTableByDate(tableId, dateColumnIndex, startDate, endDate, isMonthYear = false) {
+    function filterTableByDate(tableId, dateColumnIndex, startDate, endDate) {
         const table = document.getElementById(tableId);
+        if (!table) return;
         const tr = table.querySelectorAll("tbody tr");
-        const meses = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
 
         tr.forEach(row => {
             const td = row.getElementsByTagName("td")[dateColumnIndex];
             if (td) {
-                let cellDate;
                 const dateText = td.textContent || td.innerText;
-                if(isMonthYear) {
-                    const [mesNome, ano] = dateText.split('/');
-                    const mesIndex = meses.indexOf(mesNome.toLowerCase());
-                    if(mesIndex > -1) {
-                        cellDate = new Date(ano, mesIndex, 1);
-                    }
-                } else {
-                    const dateParts = dateText.split('-');
-                    cellDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+                let cellDate;
+                if (dateText.includes('/')) { // Formato DD/MM/YYYY
+                    const parts = dateText.split('/');
+                    cellDate = new Date(parts[2], parts[1] - 1, parts[0]);
+                } else { // Formato YYYY-MM-DD
+                    const parts = dateText.split('-');
+                    cellDate = new Date(parts[0], parts[1] - 1, parts[2]);
                 }
                 
                 if (cellDate && cellDate >= startDate && cellDate <= endDate) {
@@ -498,6 +525,98 @@
         });
     }
 
+    // --- Funções dos Gráficos ---
+
+    function createPropostasChart(data) {
+        const ctx = document.getElementById('propostasChartCanvas').getContext('2d');
+        if (propostasChart) {
+            propostasChart.destroy();
+        }
+
+        data.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+
+        propostasChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.map(d => d.Mês),
+                datasets: [{
+                    label: 'Nº de Propostas',
+                    data: data.map(d => d.Quantidade),
+                    backgroundColor: 'rgba(245, 158, 11, 0.6)', // amber-500 com opacidade
+                    borderColor: 'rgba(217, 119, 6, 1)', // amber-600
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
+
+    function createAtividadesChart(data) {
+        const ctx = document.getElementById('atividadesChartCanvas').getContext('2d');
+        if (atividadesChart) {
+            atividadesChart.destroy();
+        }
+
+        // Agrega dados por data completa (YYYY-MM-DD)
+        const dataPorDataCompleta = data.reduce((acc, item) => {
+            const dataCompleta = item.Data;
+            acc[dataCompleta] = (acc[dataCompleta] || 0) + item.Quantidade;
+            return acc;
+        }, {});
+
+        const labels = Object.keys(dataPorDataCompleta).sort();
+        const dataPoints = labels.map(dia => dataPorDataCompleta[dia]);
+
+        atividadesChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Nº de Atividades',
+                    data: dataPoints,
+                    backgroundColor: 'rgba(245, 158, 11, 0.6)', // amber-500 com opacidade
+                    borderColor: 'rgba(217, 119, 6, 1)', // amber-600
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
 
     // Inicialização
     document.addEventListener('DOMContentLoaded', (event) => {

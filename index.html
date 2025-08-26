@@ -67,7 +67,6 @@
     <h1 class="text-3xl font-bold text-slate-900">Dashboard de Novos Negócios</h1>
   </header>
 
-  <!-- Navegação por Abas -->
   <div class="border-b border-slate-200">
     <nav class="-mb-px flex space-x-8" aria-label="Tabs">
       <button class="tab-link whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm tab-link-active" onclick="openTab(event, 'DadosGerais')" id="defaultOpen">
@@ -79,7 +78,6 @@
     </nav>
   </div>
 
-  <!-- Conteúdo da Aba: Dados Gerais -->
   <div id="DadosGerais" class="tab-content mt-6">
     <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
       <h3 class="text-lg font-semibold mb-4 text-slate-900">Filtro por Período</h3>
@@ -93,12 +91,11 @@
           <input type="date" id="endDate" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm">
         </div>
         <button onclick="filterTablesByDate()" class="self-end accent-bg text-white px-4 py-2 rounded-md accent-bg-hover focus:outline-none focus:ring-2 focus:ring-offset-2 accent-ring-focus">Filtrar</button>
-         <button onclick="clearDateFilter()" class="self-end bg-slate-600 text-white px-4 py-2 rounded-md hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500">Limpar Filtro</button>
+       <button onclick="clearDateFilter()" class="self-end bg-slate-600 text-white px-4 py-2 rounded-md hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500">Limpar Filtro</button>
       </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Card: Atividades por Dia -->
         <div class="bg-white p-6 rounded-lg shadow-sm">
             <h3 class="text-xl font-semibold mb-4 text-slate-900">Atividades Lançadas <span id="totalAtividades" class="accent-text font-bold"></span></h3>
             <div class="table-container">
@@ -116,31 +113,25 @@
             </div>
         </div>
 
-        <!-- Card: Detalhes da Proposta -->
         <div class="bg-white p-6 rounded-lg shadow-sm">
             <h3 class="text-xl font-semibold text-slate-900">Detalhes da Proposta <span id="totalPropostas" class="accent-text font-bold"></span></h3>
             <div class="table-container">
                 <table id="propostasDetalhadasTable" class="min-w-full divide-y divide-slate-200">
                     <thead class="bg-slate-50">
-                        <!-- Gerado via JS -->
-                    </thead>
+                        </thead>
                     <tbody class="bg-white divide-y divide-slate-200">
-                        <!-- Gerado via JS -->
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
         </div>
     </div>
     
-    <!-- Nova Linha para os Gráficos -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-        <!-- Card: Gráfico de Atividades por Dia -->
         <div class="bg-white p-6 rounded-lg shadow-sm">
             <h3 class="text-xl font-semibold text-slate-900 mb-4">Atividades por Dia</h3>
             <canvas id="atividadesChartCanvas"></canvas>
         </div>
 
-        <!-- Card: Gráfico de Propostas por Mês -->
         <div class="bg-white p-6 rounded-lg shadow-sm">
             <h3 class="text-xl font-semibold mb-4 text-slate-900">Propostas por Mês</h3>
             <canvas id="propostasChartCanvas"></canvas>
@@ -148,7 +139,6 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-        <!-- Card: Contagem de Reuniões por Imobiliária -->
         <div class="bg-white p-6 rounded-lg shadow-sm">
             <h3 class="text-xl font-semibold mb-4 text-slate-900">Contagem de Reuniões por Imobiliária</h3>
             <div class="table-container">
@@ -165,7 +155,6 @@
             </div>
         </div>
 
-        <!-- Card: Reuniões com Imobiliárias -->
         <div class="bg-white p-6 rounded-lg shadow-sm">
             <h3 class="text-xl font-semibold mb-4 text-slate-900">Detalhes das Reuniões Realizadas <span id="totalReunioes" class="accent-text font-bold"></span></h3>
             <div class="table-container">
@@ -182,7 +171,6 @@
     </div>
   </div>
 
-  <!-- Conteúdo da Aba: Filtro por Região -->
   <div id="FiltroRegiao" class="tab-content mt-6">
     <div class="bg-white p-6 rounded-lg shadow-sm">
       <h3 class="text-lg font-semibold mb-4 text-slate-900">Filtrar Glebas por Região</h3>
@@ -208,12 +196,9 @@
 <script>
     // URLs das planilhas publicadas como CSV
     const ATIVIDADES_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTaPNwPCuGyqUOuuyy1VbzxDvPVckinCg0DVwotQerHDIp88IflAPYYBfLgViqCNybvnxfNHkpyPBDK/pub?gid=1359873248&single=true&output=csv";
-
-const IMOBILIARIAS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTaPNwPCuGyqUOuuyy1VbzxDvPVckinCg0DVwotQerHDIp88IflAPYYBfLgViqCNybvnxfNHkpyPBDK/pub?gid=172873143&single=true&output=csv";
-
-const PROPOSTAS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTaPNwPCuGyqUOuuyy1VbzxDvPVckinCg0DVwotQerHDIp88IflAPYYBfLgViqCNybvnxfNHkpyPBDK/pub?gid=2032502494&single=true&output=csv";
-
-const GLEBAS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTaPNwPCuGyqUOuuyy1VbzxDvPVckinCg0DVwotQerHDIp88IflAPYYBfLgViqCNybvnxfNHkpyPBDK/pub?gid=22338632&single=true&output=csv";
+    const IMOBILIARIAS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTaPNwPCuGyqUOuuyy1VbzxDvPVckinCg0DVwotQerHDIp88IflAPYYBfLgViqCNybvnxfNHkpyPBDK/pub?gid=172873143&single=true&output=csv";
+    const PROPOSTAS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTaPNwPCuGyqUOuuyy1VbzxDvPVckinCg0DVwotQerHDIp88IflAPYYBfLgViqCNybvnxfNHkpyPBDK/pub?gid=2032502494&single=true&output=csv";
+    const GLEBAS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTaPNwPCuGyqUOuuyy1VbzxDvPVckinCg0DVwotQerHDIp88IflAPYYBfLgViqCNybvnxfNHkpyPBDK/pub?gid=22338632&single=true&output=csv";
 
     let glebas_cols = [];
     let atividadesChart = null;
@@ -357,7 +342,7 @@ const GLEBAS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTaPNwPCuGyq
         data.forEach(item => {
             let row = '<tr class="data-row">';
             headersToShow.forEach(header => {
-                 row += `<td class="px-6 py-4 text-sm text-slate-700">${item[header] || ''}</td>`;
+                row += `<td class="px-6 py-4 text-sm text-slate-700">${item[header] || ''}</td>`;
             });
             row += '</tr>';
             tbody.innerHTML += row;
@@ -418,7 +403,7 @@ const GLEBAS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTaPNwPCuGyq
         data.forEach(item => {
             let row = '<tr class="data-row">';
             columns.forEach(col => {
-                 row += `<td class="px-6 py-4 text-sm text-slate-700">${item[col] || ''}</td>`;
+                row += `<td class="px-6 py-4 text-sm text-slate-700">${item[col] || ''}</td>`;
             });
             row += '</tr>';
             tbody.innerHTML += row;
@@ -631,4 +616,3 @@ const GLEBAS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTaPNwPCuGyq
 
 </body>
 </html>
-

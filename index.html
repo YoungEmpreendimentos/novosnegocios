@@ -67,6 +67,7 @@
     <h1 class="text-3xl font-bold text-slate-900">Dashboard de Novos Negócios</h1>
   </header>
 
+  <!-- Navegação por Abas -->
   <div class="border-b border-slate-200">
     <nav class="-mb-px flex space-x-8" aria-label="Tabs">
       <button class="tab-link whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm tab-link-active" onclick="openTab(event, 'DadosGerais')" id="defaultOpen">
@@ -78,6 +79,7 @@
     </nav>
   </div>
 
+  <!-- Conteúdo da Aba: Dados Gerais -->
   <div id="DadosGerais" class="tab-content mt-6">
     <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
       <h3 class="text-lg font-semibold mb-4 text-slate-900">Filtro por Período</h3>
@@ -91,61 +93,61 @@
           <input type="date" id="endDate" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm">
         </div>
         <button onclick="filterTablesByDate()" class="self-end accent-bg text-white px-4 py-2 rounded-md accent-bg-hover focus:outline-none focus:ring-2 focus:ring-offset-2 accent-ring-focus">Filtrar</button>
-        <button onclick="clearDateFilter()" class="self-end bg-slate-600 text-white px-4 py-2 rounded-md hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500">Limpar Filtro</button>
+         <button onclick="clearDateFilter()" class="self-end bg-slate-600 text-white px-4 py-2 rounded-md hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500">Limpar Filtro</button>
       </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div class="bg-white p-6 rounded-lg shadow-sm">
-        <h3 class="text-xl font-semibold mb-4 text-slate-900">Atividades por Dia</h3>
-        <canvas id="atividadesChartCanvas"></canvas>
-      </div>
-
-      <div class="bg-white p-6 rounded-lg shadow-sm">
-        <h3 class="text-xl font-semibold text-slate-900">Detalhes da Proposta <span id="totalPropostas" class="accent-text font-bold"></span></h3>
-        <div class="table-container">
-          <table id="propostasDetalhadasTable" class="min-w-full divide-y divide-slate-200">
-            <thead class="bg-slate-50">
-            </thead>
-            <tbody class="bg-white divide-y divide-slate-200">
-            </tbody>
-          </table>
+        <!-- Card: Gráfico de Atividades por Dia -->
+        <div class="bg-white p-6 rounded-lg shadow-sm">
+            <h3 class="text-xl font-semibold text-slate-900 mb-4">Atividades por Dia <span id="totalAtividades" class="accent-text font-bold"></span></h3>
+            <canvas id="atividadesChartCanvas"></canvas>
         </div>
-      </div>
+        
+        <!-- Card: Detalhes da Proposta -->
+        <div class="bg-white p-6 rounded-lg shadow-sm">
+            <h3 class="text-xl font-semibold text-slate-900 mb-4">Detalhes da Proposta <span id="totalPropostas" class="accent-text font-bold"></span></h3>
+            <div class="table-container">
+                <table id="propostasDetalhadasTable" class="min-w-full divide-y divide-slate-200">
+                    <thead class="bg-slate-50"></thead>
+                    <tbody class="bg-white divide-y divide-slate-200"></tbody>
+                </table>
+            </div>
+        </div>
     </div>
     
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-      <div class="bg-white p-6 rounded-lg shadow-sm">
-        <h3 class="text-xl font-semibold mb-4 text-slate-900">Propostas por Mês</h3>
-        <canvas id="propostasChartCanvas"></canvas>
-      </div>
+    <!-- Nova Linha para os Gráficos -->
+    <div class="grid grid-cols-1 gap-6 mt-6">
+        <!-- Card: Gráfico de Propostas por Mês -->
+        <div class="bg-white p-6 rounded-lg shadow-sm">
+            <h3 class="text-xl font-semibold mb-4 text-slate-900">Propostas por Mês</h3>
+            <canvas id="propostasChartCanvas"></canvas>
+        </div>
     </div>
   </div>
 
+  <!-- Conteúdo da Aba: Filtro por Região -->
   <div id="FiltroRegiao" class="tab-content mt-6">
     <div class="bg-white p-6 rounded-lg shadow-sm">
       <h3 class="text-lg font-semibold mb-4 text-slate-900">Filtrar Glebas por Região</h3>
       <div>
-        <label for="regiaoSelect" class="block text-sm font-medium text-slate-700">Selecione uma Região</label>
-        <select id="regiaoSelect" onchange="filterGlebas()" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-slate-300 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm rounded-md">
-        </select>
+          <label for="regiaoSelect" class="block text-sm font-medium text-slate-700">Selecione uma Região</label>
+          <select id="regiaoSelect" onchange="filterGlebas()" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-slate-300 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm rounded-md"></select>
       </div>
 
       <h3 class="text-xl font-semibold mt-8 mb-4 text-slate-900">Detalhes da Gleba <span id="glebasCount" class="accent-text font-bold"></span></h3>
       <div class="overflow-x-auto table-container">
-        <table id="glebasTable" class="min-w-full divide-y divide-slate-200">
-          <thead class="bg-slate-50">
-          </thead>
-          <tbody class="bg-white divide-y divide-slate-200">
-          </tbody>
-        </table>
+          <table id="glebasTable" class="min-w-full divide-y divide-slate-200">
+              <thead class="bg-slate-50"></thead>
+              <tbody class="bg-white divide-y divide-slate-200"></tbody>
+          </table>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-    // URLs das planilhas publicadas como CSV
+    // URLs das planilhas
     const ATIVIDADES_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTaPNwPCuGyqUOuuyy1VbzxDvPVckinCg0DVwotQerHDIp88IflAPYYBfLgViqCNybvnxfNHkpyPBDK/pub?gid=1359873248&single=true&output=csv";
     const PROPOSTAS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTaPNwPCuGyqUOuuyy1VbzxDvPVckinCg0DVwotQerHDIp88IflAPYYBfLgViqCNybvnxfNHkpyPBDK/pub?gid=2032502494&single=true&output=csv";
     const GLEBAS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTaPNwPCuGyqUOuuyy1VbzxDvPVckinCg0DVwotQerHDIp88IflAPYYBfLgViqCNybvnxfNHkpyPBDK/pub?gid=22338632&single=true&output=csv";
@@ -153,18 +155,11 @@
     let glebas_cols = [];
     let atividadesChart = null;
     let propostasChart = null;
-    
-    // Paleta de cores para o gráfico de barras empilhadas
-    const COLORS = [
-        'rgba(245, 158, 11, 0.6)', // amber-500
-        'rgba(234, 88, 12, 0.6)', // orange-600
-        'rgba(249, 115, 22, 0.6)', // orange-500
-        'rgba(251, 146, 60, 0.6)', // orange-400
-        'rgba(253, 186, 116, 0.6)' // orange-300
-    ];
 
-    // Função para parsear texto CSV para um array de objetos
     function parseCSV(text) {
+        if (text.trim().toLowerCase().startsWith('<!doctype html')) {
+             throw new Error('Um dos links da planilha parece estar inválido ou inacessível.');
+        }
         const lines = text.trim().split('\n');
         const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
         const rows = [];
@@ -180,50 +175,57 @@
         return { headers, rows };
     }
 
-    // Função principal para carregar e processar todos os dados
     async function loadDashboardData() {
         document.getElementById('loading-indicator').style.display = 'block';
         try {
-            const [atividadesRes, propostasRes, glebasRes] = await Promise.all([
-                fetch(ATIVIDADES_URL),
-                fetch(PROPOSTAS_URL),
-                fetch(GLEBAS_URL)
+            const responses = await Promise.all([
+                fetch(ATIVIDADES_URL), fetch(PROPOSTAS_URL), fetch(GLEBAS_URL)
             ]);
+            
+            for (const response of responses) {
+                if (!response.ok) {
+                    throw new Error(`Falha ao carregar dados de uma planilha: ${response.statusText}`);
+                }
+            }
 
-            const atividadesText = await atividadesRes.text();
-            const propostasText = await propostasRes.text();
-            const glebasText = await glebasRes.text();
+            const [atividadesText, propostasText, glebasText] = await Promise.all(responses.map(res => res.text()));
 
-            // Processar Atividades para o gráfico empilhado
+            // Processar Atividades
             const { headers: atividadesHeaders, rows: atividadesRawData } = parseCSV(atividadesText);
             const atividadesData = atividadesRawData.filter(row => row[atividadesHeaders[0]] && !isNaN(parseInt(row[atividadesHeaders[0]], 10)));
-            createAtividadesChart(atividadesData);
+            const atividadesPorDia = atividadesData.reduce((acc, row) => {
+                const data = row['Data'];
+                const tipoContato = row['Tipo de Contato'];
+                if (!data || !tipoContato || tipoContato.trim() === '') return acc;
+                const dateParts = data.split('/');
+                if (dateParts.length !== 3) return acc;
+                const dateKey = `${dateParts[2]}-${dateParts[1].padStart(2, '0')}-${dateParts[0].padStart(2, '0')}`;
+                const key = `${dateKey}|${tipoContato}`;
+                if (!acc[key]) acc[key] = { Data: dateKey, 'Tipo de Contato': tipoContato, Quantidade: 0 };
+                acc[key].Quantidade++;
+                return acc;
+            }, {});
+            const allAtividadesData = Object.values(atividadesPorDia);
+            document.getElementById('totalAtividades').innerText = `(${allAtividadesData.reduce((sum, item) => sum + item.Quantidade, 0)})`;
+            createAtividadesChart(allAtividadesData);
 
             // Processar Propostas
             const meses = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
             const { headers: propostasHeaders, rows: propostasRawData } = parseCSV(propostasText);
             const propostasData = propostasRawData.filter(row => row[propostasHeaders[0]] && !isNaN(parseInt(row[propostasHeaders[0]], 10)));
-            
             document.getElementById('totalPropostas').innerText = `(${propostasData.length})`;
-            // Incluindo a nova coluna 'Apelido Gleba'
             populatePropostasDetalhadas(propostasData, propostasHeaders);
-
             const propostasPorMes = propostasData.reduce((acc, row) => {
                 const data = row['Data'];
                 if (!data) return acc;
                 const dateParts = data.split('/');
                 if (dateParts.length !== 3) return acc;
-                
                 const mesIndex = parseInt(dateParts[1], 10) - 1;
                 const ano = dateParts[2];
                 if (isNaN(mesIndex) || mesIndex < 0 || mesIndex > 11 || isNaN(parseInt(ano))) return acc;
-
                 const sortKey = `${ano}-${dateParts[1].padStart(2, '0')}`;
                 const displayMes = `${meses[mesIndex]}/${ano}`;
-
-                if (!acc[sortKey]) {
-                    acc[sortKey] = { Mês: displayMes, sortKey: sortKey, Quantidade: 0 };
-                }
+                if (!acc[sortKey]) acc[sortKey] = { Mês: displayMes, sortKey: sortKey, Quantidade: 0 };
                 acc[sortKey].Quantidade++;
                 return acc;
             }, {});
@@ -234,22 +236,19 @@
             const glebasData = glebasRawData.filter(row => row[glebasHeaders[0]] && !isNaN(parseInt(row[glebasHeaders[0]], 10)));
             glebas_cols = glebasHeaders;
             document.getElementById('glebasCount').innerText = `(${glebasData.length})`;
-            const regioes = ["Metropolitana", "Litoral", "Santa Catarina"];
-            populateSelect('regiaoSelect', regioes);
+            populateSelect('regiaoSelect', ["Metropolitana", "Litoral", "Santa Catarina"]);
             populateTable('glebasTable', glebasHeaders, glebasData.map(row => glebasHeaders.map(h => row[h])));
 
         } catch (error) {
-            console.error("Erro ao carregar os dados do dashboard:", error);
-            // Mensagem de erro customizada em vez de alert
-            const errorElement = document.createElement('div');
-            errorElement.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 text-white p-6 rounded-lg shadow-lg z-50';
-            errorElement.innerHTML = `
-                <div class="flex flex-col items-center">
-                    <span class="text-2xl font-bold mb-2">Erro</span>
-                    <p>Não foi possível carregar os dados das planilhas. Verifique sua conexão e se os links estão corretos.</p>
+            console.error("Erro ao carregar dados do dashboard:", error);
+            const container = document.querySelector('.container');
+            container.innerHTML = `
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative" role="alert">
+                    <strong class="font-bold">Erro ao Carregar Dados!</strong>
+                    <span class="block sm:inline">${error.message}</span>
+                    <p class="mt-2">Por favor, verifique se os links das planilhas estão corretos e se elas foram <strong>publicadas na web como CSV</strong>. É necessário gerar um novo link de publicação se a planilha foi alterada.</p>
                 </div>
             `;
-            document.body.appendChild(errorElement);
         } finally {
             document.getElementById('loading-indicator').style.display = 'none';
         }
@@ -257,263 +256,173 @@
 
     function populatePropostasDetalhadas(data, headers) {
         const table = document.getElementById('propostasDetalhadasTable');
-        const thead = table.querySelector('thead');
-        const tbody = table.querySelector('tbody');
-        thead.innerHTML = '';
-        tbody.innerHTML = '';
-
-        // Adicionando 'Apelido Gleba' à lista de colunas desejadas
-        const colunasDesejadas = ['Data', 'Cidade', 'Status', 'Apelido Gleba'];
-        const headersToShow = headers.filter(h => colunasDesejadas.includes(h));
-
-        let headerRow = '<tr>';
-        headersToShow.forEach(header => {
-            headerRow += `<th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">${header}</th>`;
-        });
-        headerRow += '</tr>';
-        thead.innerHTML = headerRow;
-
-        data.forEach(item => {
-            let row = '<tr class="data-row">';
-            headersToShow.forEach(header => {
-                row += `<td class="px-6 py-4 text-sm text-slate-700">${item[header] || ''}</td>`;
-            });
-            row += '</tr>';
-            tbody.innerHTML += row;
-        });
+        const cols = headers.filter(h => ['Data', 'Cidade', 'Apelido Gleba', 'Status'].includes(h));
+        populateTable(table.id, cols, data.map(row => cols.map(c => row[c])));
     }
 
     function populateTable(tableId, headers, data) {
         const table = document.getElementById(tableId);
         const thead = table.querySelector('thead');
         const tbody = table.querySelector('tbody');
-        
         thead.innerHTML = '';
         tbody.innerHTML = '';
 
         let headerRow = '<tr>';
-        headers.forEach(header => {
-            headerRow += `<th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">${header}</th>`;
-        });
-        headerRow += '</tr>';
-        thead.innerHTML = headerRow;
+        headers.forEach(header => headerRow += `<th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">${header}</th>`);
+        thead.innerHTML = headerRow + '</tr>';
 
         const compactColumns = ['Observações', 'Tarefas', 'Comentários  (AUT)'];
-
         data.forEach(rowData => {
-            let row = '<tr class="data-row">';
+            let rowHtml = '<tr class="data-row">';
             rowData.forEach((cellData, index) => {
                 const header = headers[index];
                 const cleanCellData = cellData || '';
-                
                 let tdClass = 'px-6 py-4 text-sm text-slate-700';
-
                 if (tableId === 'glebasTable' && compactColumns.includes(header)) {
                     tdClass += ' compact-column';
-                    row += `<td class="${tdClass}" title="${cleanCellData.replace(/"/g, '&quot;')}">${cleanCellData}</td>`;
+                    rowHtml += `<td class="${tdClass}" title="${cleanCellData.replace(/"/g, '&quot;')}">${cleanCellData}</td>`;
                 } else {
-                    row += `<td class="${tdClass}">${cleanCellData}</td>`;
+                    rowHtml += `<td class="${tdClass}">${cleanCellData}</td>`;
                 }
             });
-            row += '</tr>';
-            tbody.innerHTML += row;
+            tbody.innerHTML += rowHtml + '</tr>';
         });
     }
-    
+
     function populateSelect(selectId, options) {
         const select = document.getElementById(selectId);
         select.innerHTML = '<option value="">Todas</option>';
-        options.forEach(option => {
-            if(option) {
-                select.innerHTML += `<option value="${option}">${option}</option>`;
-            }
-        });
+        options.forEach(option => select.innerHTML += `<option value="${option}">${option}</option>`);
     }
 
     function openTab(evt, tabName) {
-      let i, tabcontent, tablinks;
-      tabcontent = document.getElementsByClassName("tab-content");
-      for (i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].classList.remove("active");
-      }
-      tablinks = document.getElementsByClassName("tab-link");
-      for (i = 0; i < tablinks.length; i++) {
-        tablinks[i].className = tablinks[i].className.replace(" tab-link-active", " border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300");
-      }
+      document.querySelectorAll(".tab-content").forEach(tc => tc.classList.remove("active"));
+      document.querySelectorAll(".tab-link").forEach(tl => tl.className = tl.className.replace(" tab-link-active", " border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"));
       document.getElementById(tabName).classList.add("active");
       evt.currentTarget.className = evt.currentTarget.className.replace(" border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300", " tab-link-active");
     }
 
     function filterGlebas() {
-      const select = document.getElementById("regiaoSelect");
-      const filter = select.value.toUpperCase();
+      const filter = document.getElementById("regiaoSelect").value.toUpperCase();
       const table = document.getElementById("glebasTable");
       const tr = table.querySelectorAll("tbody tr");
-      const regiaoHeaderName = glebas_cols.find(h => h.trim().toLowerCase() === 'região' || h.trim().toLowerCase() === 'regiao');
+      const regiaoHeaderName = glebas_cols.find(h => h.trim().toLowerCase().startsWith('regi'));
       const regiaoIndex = glebas_cols.indexOf(regiaoHeaderName);
       let visibleCount = 0;
 
       tr.forEach(row => {
         const td = row.getElementsByTagName("td")[regiaoIndex];
+        let isVisible = false;
         if (td) {
           const txtValue = td.textContent || td.innerText;
           if (filter === "" || txtValue.toUpperCase().indexOf(filter) > -1) {
-            row.style.display = "";
-            visibleCount++;
-          } else {
-            row.style.display = "none";
+            isVisible = true;
           }
         }
+        row.style.display = isVisible ? "" : "none";
+        if(isVisible) visibleCount++;
       });
       document.getElementById('glebasCount').innerText = `(${visibleCount})`;
     }
     
     function filterTablesByDate() {
-        let startDateInput = document.getElementById('startDate').value;
-        let endDateInput = document.getElementById('endDate').value;
-
-        if (!startDateInput || !endDateInput) return;
-
-        let startDate = new Date(startDateInput + 'T00:00:00');
-        let endDate = new Date(endDateInput + 'T23:59:59');
-        
-        // Apenas filtra a tabela de propostas
+        const startDate = new Date(document.getElementById('startDate').value + 'T00:00:00');
+        const endDate = new Date(document.getElementById('endDate').value + 'T23:59:59');
+        if (!document.getElementById('startDate').value || !document.getElementById('endDate').value) return;
         filterTableByDate('propostasDetalhadasTable', 0, startDate, endDate);
     }
     
     function clearDateFilter() {
         document.getElementById('startDate').value = '';
         document.getElementById('endDate').value = '';
-        
-        // Apenas mostra todas as linhas da tabela de propostas
         showAllRows('propostasDetalhadasTable');
     }
 
     function showAllRows(tableId) {
-        const table = document.getElementById(tableId);
-        if (!table) return;
-        const tr = table.querySelectorAll("tbody tr");
-        tr.forEach(row => row.style.display = "");
+        document.querySelectorAll(`#${tableId} tbody tr`).forEach(row => row.style.display = "");
     }
 
     function filterTableByDate(tableId, dateColumnIndex, startDate, endDate) {
-        const table = document.getElementById(tableId);
-        if (!table) return;
-        const tr = table.querySelectorAll("tbody tr");
-
+        const tr = document.querySelectorAll(`#${tableId} tbody tr`);
         tr.forEach(row => {
             const td = row.getElementsByTagName("td")[dateColumnIndex];
             if (td) {
                 const dateText = td.textContent || td.innerText;
-                let cellDate;
-                if (dateText.includes('/')) { // Formato DD/MM/YYYY
-                    const parts = dateText.split('/');
-                    cellDate = new Date(parts[2], parts[1] - 1, parts[0]);
-                } else { // Formato YYYY-MM-DD
-                    const parts = dateText.split('-');
-                    cellDate = new Date(parts[0], parts[1] - 1, parts[2]);
-                }
-                
-                if (cellDate && cellDate >= startDate && cellDate <= endDate) {
-                    row.style.display = "";
-                } else {
-                    row.style.display = "none";
-                }
+                const parts = dateText.split(dateText.includes('/') ? '/' : '-');
+                const cellDate = dateText.includes('/') ? new Date(parts[2], parts[1] - 1, parts[0]) : new Date(parts[0], parts[1] - 1, parts[2]);
+                row.style.display = (cellDate && cellDate >= startDate && cellDate <= endDate) ? "" : "none";
             }
         });
     }
 
     // --- Funções dos Gráficos ---
+    function createChart(canvasId, chartInstance, type, data, options) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        if (chartInstance) chartInstance.destroy();
+        return new Chart(ctx, { type, data, options });
+    }
+
+    const colorPalette = [
+        'rgba(245, 158, 11, 0.7)', 'rgba(59, 130, 246, 0.7)', 'rgba(16, 185, 129, 0.7)', 
+        'rgba(239, 68, 68, 0.7)', 'rgba(139, 92, 246, 0.7)', 'rgba(217, 70, 239, 0.7)'
+    ];
+    const borderColorPalette = [
+        'rgba(217, 119, 6, 1)', 'rgba(37, 99, 235, 1)', 'rgba(5, 150, 105, 1)',
+        'rgba(220, 38, 38, 1)', 'rgba(124, 58, 237, 1)', 'rgba(192, 38, 211, 1)'
+    ];
 
     function createPropostasChart(data) {
-        const ctx = document.getElementById('propostasChartCanvas').getContext('2d');
-        if (propostasChart) {
-            propostasChart.destroy();
-        }
-
         data.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+        propostasChart = createChart('propostasChartCanvas', propostasChart, 'bar', {
+            labels: data.map(d => d.Mês),
+            datasets: [{
+                label: 'Nº de Propostas',
+                data: data.map(d => d.Quantidade),
+                backgroundColor: colorPalette[0],
+                borderColor: borderColorPalette[0],
+                borderWidth: 1
+            }]
+        }, { responsive: true, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }}}, plugins: { legend: { display: false }}});
+    }
 
-        propostasChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: data.map(d => d.Mês),
-                datasets: [{
-                    label: 'Nº de Propostas',
-                    data: data.map(d => d.Quantidade),
-                    backgroundColor: 'rgba(245, 158, 11, 0.6)', // amber-500 com opacidade
-                    borderColor: 'rgba(217, 119, 6, 1)', // amber-600
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                }
+    function createAtividadesChart(data) {
+        const labels = [...new Set(data.map(item => item.Data))].sort();
+        const tiposDeContato = [...new Set(data.map(item => item['Tipo de Contato']))];
+        
+        const datasets = tiposDeContato.map((tipo, index) => ({
+            label: tipo,
+            data: labels.map(label => {
+                const found = data.find(d => d.Data === label && d['Tipo de Contato'] === tipo);
+                return found ? found.Quantidade : 0;
+            }),
+            backgroundColor: colorPalette[index % colorPalette.length],
+            borderColor: borderColorPalette[index % borderColorPalette.length],
+            borderWidth: 1
+        }));
+
+        atividadesChart = createChart('atividadesChartCanvas', atividadesChart, 'bar', {
+            labels: labels,
+            datasets: datasets
+        }, { 
+            responsive: true, 
+            scales: { 
+                x: { stacked: true },
+                y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1 }}
+            }, 
+            plugins: { 
+                legend: { display: true, position: 'top' }
             }
         });
     }
 
-    function createAtividadesChart(data) {
-        const ctx = document.getElementById('atividadesChartCanvas').getContext('2d');
-        if (atividadesChart) {
-            atividadesChart.destroy();
-        }
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', () => {
+        loadDashboardData();
+        document.getElementById("defaultOpen").click();
+    });
 
-        // Agrupa os dados por data e tipo de contato
-        const dataPorDiaETipo = data.reduce((acc, item) => {
-            const dataCompleta = item['Data'];
-            const tipoContato = item['Tipo de Contato'];
-            
-            if (!dataCompleta || !tipoContato) return acc;
-            
-            if (!acc[dataCompleta]) {
-                acc[dataCompleta] = {};
-            }
-            acc[dataCompleta][tipoContato] = (acc[dataCompleta][tipoContato] || 0) + 1;
-            return acc;
-        }, {});
+</script>
 
-        const labels = Object.keys(dataPorDiaETipo).sort();
-        const tiposDeContato = [...new Set(data.map(item => item['Tipo de Contato']))].sort();
-        
-        const datasets = tiposDeContato.map((tipo, index) => {
-            return {
-                label: tipo,
-                data: labels.map(label => dataPorDiaETipo[label][tipo] || 0),
-                backgroundColor: COLORS[index % COLORS.length],
-                borderColor: COLORS[index % COLORS.length].replace('0.6', '1'),
-                borderWidth: 1
-            };
-        });
+</body>
+</html>
 
-        atividadesChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: datasets
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                scales: {
-                    x: {
-                        stacked: true,
-                        title: {
-                            display: true,
-                            text: 'Data'
-                        }
-                    },
-                    y: {
-                        stacked: true,
